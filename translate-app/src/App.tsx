@@ -4,9 +4,16 @@ import body from './body.svg';
 import './styles/Main.sass';
 import {css} from '@emotion/css'
 import GeneratePhrase from "./elements/GeneratePhrase";
+import WordsFiled from "./elements/words_field";
+
+
+const randomInteger = (min: number, max: number) => {
+    return Math.floor(min + Math.random() * (max + 1 - min));
+}
 
 
 function App() {
+    let randomPhrase = randomInteger(0, 9)
     return (
         <div className="App">
             <h1>Translate this sentence</h1>
@@ -15,8 +22,9 @@ function App() {
                     <img src={head} className={Head} alt="Head"/>
                     <img src={body} className="" alt="Body"/>
                 </span>
-                <GeneratePhrase/>
+                <GeneratePhrase randomInt={randomPhrase}/>
             </div>
+            <WordsFiled randomInt={randomPhrase}/>
         </div>
     );
 }

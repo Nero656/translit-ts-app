@@ -41,13 +41,13 @@ const initialState: PhraseState = {
             id: 4,
             phrase: 'домашние животные',
             translate: 'domestic animals',
-            language: 0
+            language: 1
         },
         {
             id: 5,
             phrase: 'Я попрошу своих юристов составить договор.',
             translate: 'I\'ll have my lawyers draw up a contract.',
-            language: 0
+            language: 1
         },
         {
             id: 6,
@@ -59,21 +59,22 @@ const initialState: PhraseState = {
             id: 7,
             phrase: 'враждебность сдерживаемая разумом (интеллектом)',
             translate: 'a hostility tempered by intellect',
-            language: 0
+            language: 1
         },
         {
             id: 8,
             phrase: 'Признание — это самый мощный фактор мотивации.',
             translate: 'Recognition is the most powerful motivation factor.',
-            language: 0
+            language: 1
         },
         {
             id: 9,
             phrase: 'Наша компания управляет авиалинией в Аргентине',
             translate: 'Our company operates an airline in Argentina.',
-            language: 0
+            language: 1
         }
-    ]
+    ],
+
 };
 
 export const PhraseSlice = createSlice({

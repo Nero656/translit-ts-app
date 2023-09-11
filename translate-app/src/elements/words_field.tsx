@@ -8,7 +8,9 @@ interface Props {
 
 type Words = {
     id: number,
-    word: string
+    key: number,
+    word: string,
+    enabled: boolean
 }
 
 type Boards = {
@@ -17,7 +19,13 @@ type Boards = {
 }
 
 
-export class Words_field extends React.Component<Props, { phrase: string[], boards: Boards[]}> {
+export class Words_field extends React.Component<Props,
+    {
+        phrase: string[],
+        boards: Boards[],
+        isError: boolean,
+        isSuccess: boolean
+    }> {
     private currentWord: Words
     private currentBoard: Boards
 
@@ -29,10 +37,12 @@ export class Words_field extends React.Component<Props, { phrase: string[], boar
                 {id: 0, wordsList: []},
                 {id: 1, wordsList: []},
                 {id: 2, wordsList: []},
-            ]
+            ],
+            isError: false,
+            isSuccess: false
         }
 
-        this.currentWord = {id: 0, word: ''}
+        this.currentWord = {id: 0, key: 0, word: '', enabled: false}
         this.currentBoard = {id: 0, wordsList: []}
     }
 
@@ -52,14 +62,25 @@ export class Words_field extends React.Component<Props, { phrase: string[], boar
         const wordsArray = phraseWords.map((word, index) =>
             ({
                 id: index,
-                word: word
+                key: index,
+                word: word,
+                enabled: true
             })
         )
 
+        while (wordsArray.length < 12) {
+            wordsArray.push({
+                id: wordsArray.length,
+                key: wordsArray.length,
+                word: ' ',
+                enabled: false
+            })
+        }
+
         const newBoard = [
-                {id: 0, wordsList: []},
-                {id: 1, wordsList: []},
-                {id: 2, wordsList: wordsArray}
+            {id: 0, wordsList: []},
+            {id: 1, wordsList: []},
+            {id: 2, wordsList: wordsArray}
         ]
 
         this.setState({
@@ -73,7 +94,6 @@ export class Words_field extends React.Component<Props, { phrase: string[], boar
     }
 
     private dragLeaveHandler(e: React.DragEvent<HTMLSpanElement>) {
-
     }
 
     private dragEndHandler(e: React.DragEvent<HTMLSpanElement>) {
@@ -84,20 +104,7 @@ export class Words_field extends React.Component<Props, { phrase: string[], boar
         e.preventDefault()
     }
 
-    private dropHandler(e: React.DragEvent<HTMLSpanElement>, board: Boards, word: Words) {
-        e.preventDefault()
-        const wordsList = board.wordsList
-
-        let wordsArray = wordsList.map(item => {
-            if (item.id === word.id) {
-                return {...item, id: this.currentWord?.id}
-            }
-            if (item.id === this.currentWord?.id) {
-                return {...item, id: word.id}
-            }
-            return item
-        })
-
+    private boardUpdate(wordsArray: Words[], board: Boards) {
         const boardList = this.state.boards
 
         const boardArray = boardList.map(item => {
@@ -105,6 +112,7 @@ export class Words_field extends React.Component<Props, { phrase: string[], boar
                     item.wordsList = wordsArray
                     return board
                 }
+
                 if (item.id === this.currentBoard?.id) {
                     return this.currentBoard
                 }
@@ -112,54 +120,67 @@ export class Words_field extends React.Component<Props, { phrase: string[], boar
             }
         )
 
+        if (this.currentBoard.id === 2 && board.id !== 2) {
+            this.state.boards[2].wordsList.push({
+                id: this.state.boards[2].wordsList.length,
+                key: this.state.boards[2].wordsList.length,
+                word: ' ',
+                enabled: false
+            })
+        } else if (this.state.boards[2].id === board.id && this.currentBoard.id !== 2) {
+            this.state.boards[2].wordsList.splice(10, 1)
+        }
+
         this.setState({
             boards: boardArray
         })
     }
 
-    dropBoardHandler(e: React.DragEvent<HTMLDivElement>, board: Boards) {
+    private dropHandler(e: React.DragEvent<HTMLSpanElement>, board: Boards, word: Words) {
         e.preventDefault()
+        const wordsList = board.wordsList
+
+        board.wordsList = wordsList.map(item => {
+            if (item.id === word.id) {
+                return {...item, key: this.currentWord?.key}
+            }
+            if (item.id === this.currentWord?.id) {
+                return {...item, key: word.key}
+            }
+            return item
+        })
+
+
+        // this.boardUpdate(wordsArray, board)
+    }
+
+    private dropBoardHandler(e: React.DragEvent<HTMLDivElement>, board: Boards) {
+        e.preventDefault()
+        this.currentWord.key += 1
         board.wordsList.push(this.currentWord)
 
         const currentIndex = this.currentBoard.wordsList.indexOf(this.currentWord)
         this.currentBoard.wordsList.splice(currentIndex, 1)
 
+
         const wordsList = board.wordsList
 
-        let wordsArray = wordsList.map(item => {
-            if (item.id === this.currentWord.id && board.id === this.state.boards[this.state.boards.length-1].id) {
-                return {...item}
-            }
-            return item
-        })
-
-        const boardList = this.state.boards
-        const boardArray = boardList.map(item => {
-                if (item.id === board.id) {
-                    item.wordsList = wordsArray
-                    return board
-                }
-                if (item.id === this.currentBoard?.id) {
-                    return this.currentBoard
-                }
-                return item
-            }
-        )
-
-        this.setState({
-            boards: boardArray
-        })
-
-        // const dropIndex = board.wordsList.indexOf(word)
-        // board.wordsList.splice(dropIndex + 1, 0, this.currentWord)
+        this.boardUpdate(wordsList, board)
     }
 
+    private sortWords = (a: Words, b: Words) => {
+        return a.key > b.key ? 1 : -1
+    }
 
-    sortWords = (a: Words, b: Words) => {
-        if (a.id > b.id)
-            return +1
+    private sortWordsByEnabled = (a: Words, b: Words) => {
+        return a.enabled < b.enabled ? 1 : -1
+    }
+
+    private answerCheck = () => {
+        if (this.state.boards[0].wordsList.length === 0 && this.state.boards[1].wordsList.length === 0)
+            return true
         else
-            return -1
+            return false
     }
 
 
@@ -189,9 +210,38 @@ export class Words_field extends React.Component<Props, { phrase: string[], boar
           box-shadow: 0 8px 4px -6px rgba(0, 0, 0, 0.25);
           user-select: none;
         `
-        const button = css`
+        const wordEmpty = css`
+          cursor: revert;
+          height: 1.875rem;
+          padding: .25rem .25rem .31rem .25rem;
+          text-align: center;
+          flex-shrink: 0;
+          border-radius: 0.8125rem;
+          background: #E6E6E6;
+          box-shadow: 0px 8px 4px -6px rgba(0, 0, 0, 0.25) inset;
+          user-select: none;
+        `
+        const ansBlock = css`
+          height: 10rem;
+        `
+        const errorMes = css`
+          position: relative;
+          top: 5rem;
+          color: #F00;
+          text-shadow: 1px 2px 2px rgba(91, 13, 13, 0.50), -1px -2px 2px #FFF;
+          text-align: center;
+          z-index: 1;
+        `
+        const successMes = css`
+          position: relative;
+          top: 5rem;
+          color: #2fff00;
+          text-shadow: 1px 2px 2px rgba(30, 91, 13, 0.5), -1px -2px 2px #FFF;
+          text-align: center;
+          z-index: 1;
+        `
+        let button = css`
           width: 30rem;
-          transition: .5s;
           color: #7b7b7b;
           margin-top: 5rem;
           height: 4.25rem;
@@ -203,7 +253,9 @@ export class Words_field extends React.Component<Props, { phrase: string[], boar
           font-style: normal;
           font-weight: 700;
           line-height: normal;
-
+          position: absolute;
+          z-index: 2;
+          
           &:hover {
             color: #000;
             cursor: pointer;
@@ -214,12 +266,53 @@ export class Words_field extends React.Component<Props, { phrase: string[], boar
             cursor: pointer;
             box-shadow: 2px 4px 8px 0px rgba(0, 0, 0, 0.20) inset, -2px -4px 12px 0px #FFF inset;
           }
+
+          &:disabled,
+          button[disabled] {
+            color: #7b7b7b;
+            border-radius: 5.5rem;
+            background: linear-gradient(91deg, #FFF 100%, #F2F2F2 100%);
+            box-shadow: 2px 4px 8px 0px rgba(0, 0, 0, 0.20), -2px -4px 8px 0px #FFF;
+          }
+
+          
         `
+        const but_anim = css`
+          animation: errorAns 3s forwards;
+          @keyframes errorAns {
+            100% {
+              transform: translateY(2.5rem);
+            }
+          }
+        `
+
+        const wordIsEmpty = (enabled: boolean) => {
+            switch (enabled) {
+                case true:
+                    return {style: word, drag: true};
+                case false:
+                    return {style: wordEmpty, drag: false}
+            }
+        }
+
+        const answer = () => {
+            let phrase: string = ''
+            for (let i = 0; i < 2; i++) {
+                this.state.boards[i].wordsList.map(word => {
+                    phrase += word.word + ' '
+                })
+            }
+            phrase = phrase.slice(0, -1)
+            if (phrase === store.getState().phrase.phrases[this.props.randomInt].translate) {
+                this.setState({isError: false, isSuccess: true})
+            } else
+                this.setState({isError: true, isSuccess: false})
+        }
 
         return <div>
             {this.state.boards.map((board, index) =>
                 <div onDragOver={(e) => this.dragOverHandler(e)}
-                onDrop={(e) => this.dropBoardHandler(e, board)}
+                     onDrop={(e) => this.dropBoardHandler(e, board)}
                      key={board.id}>
                     {this.state.boards[this.state.boards.length - 1].id !== board.id &&
                         <div className={answerArea}>
@@ -242,36 +335,64 @@ export class Words_field extends React.Component<Props, { phrase: string[], boar
 
                     {this.state.boards[this.state.boards.length - 1].id === board.id &&
                         <div className={wordField}>
-                            {board.wordsList.sort(this.sortWords).map((item, index) =>
+                            {board.wordsList.sort(this.sortWordsByEnabled).map((item, index) =>
                                 <span
                                     key={index}
-                                    className={word}
-                                    draggable={true}
-                                    onDragStart={(e) => this.dragStartHandler(e, board, item)}
+                                    className={wordIsEmpty(item.enabled).style}
+                                    draggable={wordIsEmpty(item.enabled).drag}
+                                    onDragStart={
+                                        (e) =>
+                                            this.dragStartHandler(e, board, item)
+                                    }
                                     onDragLeave={(e) => this.dragLeaveHandler(e)}
                                     onDragEnd={(e) => this.dragEndHandler(e)}
                                     onDragOver={(e) => this.dragOverHandler(e)}
                                     onDrop={(e) => this.dropHandler(e, board, item)}
                                 >
                                         {item.word}
-                                    </span>
+                                </span>
                             )}
                         </div>
                     }
                 </div>
             )}
-            {/*<div className={wordField}>*/}
-            {/*    {this.state.words.sort(this.sortWords).map((item, index) =>*/}
-            {/*            */}
-            {/*    )}*/}
-            {/*</div>*/}
 
+            <div className={ansBlock}>
+                {this.state.isError &&
+                    <>
+                        <button
+                            className={button+' '+but_anim}
+                            disabled={this.answerCheck()}
+                            onClick={(e) => answer()}>
+                            Check
+                        </button>
+                        <p className={errorMes}>Something wrong!</p>
+                    </>
+                }
 
-            <button className={button}>Check</button>
+                {this.state.isSuccess &&
+                    <>
+                        <button
+                        className={button+' '+but_anim}
+                        disabled={this.answerCheck()}
+                        onClick={(e) => answer()}>
+                        Check
+                        </button>
+                        <p className={successMes}>Answer is correct!</p>
+                     </>
+                }
+
+                {!this.state.isError && !this.state.isSuccess &&
+                    <button
+                        className={button}
+                        disabled={this.answerCheck()}
+                        onClick={(e) => answer()}>
+                        Check
+                    </button>
+                }
+            </div>
         </div>
     }
-
-
 }
 
 export default Words_field

@@ -245,7 +245,7 @@ export class Words_field extends React.Component<Props,
           flex-shrink: 0;
           border-radius: 5.5rem;
           background: linear-gradient(91deg, #FFF 0%, #F2F2F2 100%);
-          box-shadow: 2px 4px 8px 0px rgba(0, 0, 0, 0.20), -2px -4px 8px 0px #FFF;
+          box-shadow: 0px 5px 5px -5px rgba(34, 60, 80, 0.6) inset;
           font-size: 1.125rem;
           font-style: normal;
           font-weight: 700;
@@ -271,14 +271,23 @@ export class Words_field extends React.Component<Props,
             background: linear-gradient(91deg, #FFF 100%, #F2F2F2 100%);
             box-shadow: 2px 4px 8px 0px rgba(0, 0, 0, 0.20), -2px -4px 8px 0px #FFF;
           }
-
           
         `
         const but_anim = css`
           animation: errorAns 3s forwards;
           @keyframes errorAns {
+            0%{
+              margin-top: 5rem;
+              box-shadow: 0 0 0 rgba(34, 60, 80, 0.6), 0 5px 5px -5px rgba(34, 60, 80, 0.6) inset;
+            }
+            
+            50%{
+              box-shadow: 5px 0 5px -5px rgba(34, 60, 80, 0.6),0 0 0 0 rgba(34, 60, 80, 0.6) inset;
+            }
+            
             100% {
               transform: translateY(2.5rem);
+              box-shadow: 5px 5px 10px 2px rgba(34, 60, 80, 0.2);
             }
           }
         `

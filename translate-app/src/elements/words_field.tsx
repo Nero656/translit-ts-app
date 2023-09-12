@@ -58,7 +58,6 @@ export class Words_field extends React.Component<Props,
         const phraseWords = this.shuffle(this.splitString(
             store.getState().phrase.phrases[this.props.randomInt].translate, ' '
         ))
-
         const wordsArray = phraseWords.map((word, index) =>
             ({
                 id: index,
@@ -181,15 +180,24 @@ export class Words_field extends React.Component<Props,
 
 
     render() {
-        const answerArea = css`
-          width: 30rem;
-          height: 2rem;
-          border-bottom: solid 1px #4B4B4B;
+        const form = css`
           margin-top: 2.81rem;
         `
+        const answerArea = css`
+          display: grid;
+          gap: .3rem;
+          min-height: 2.5rem;
+          width: 30rem;
+          padding: .3em 0 .3em 0;
+          border-top: solid 1px #4B4B4B;
+          border-bottom: solid 1px #4B4B4B;
+          grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+          margin-top: -1px;
+        `
+
         const wordField = css`
           width: 30rem;
-          height: 2rem;
+          height: 3rem;
           margin-top: 2.81rem;
           display: grid;
           column-gap: .6rem;
@@ -270,7 +278,6 @@ export class Words_field extends React.Component<Props,
             background: linear-gradient(91deg, #FFF 100%, #F2F2F2 100%);
             box-shadow: 2px 4px 8px 0px rgba(0, 0, 0, 0.20), -2px -4px 8px 0px #FFF;
           }
-          
         `
         const but_anim = css`
           animation: errorAns 3s forwards;
@@ -315,7 +322,7 @@ export class Words_field extends React.Component<Props,
                 this.setState({isError: true, isSuccess: false})
         }
 
-        return <div>
+        return <div className={form}>
             {this.state.boards.map((board, index) =>
                 <div onDragOver={(e) => this.dragOverHandler(e)}
                      onDrop={(e) => this.dropBoardHandler(e, board)}

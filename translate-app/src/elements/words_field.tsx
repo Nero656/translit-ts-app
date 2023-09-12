@@ -149,9 +149,6 @@ export class Words_field extends React.Component<Props,
             }
             return item
         })
-
-
-        // this.boardUpdate(wordsArray, board)
     }
 
     private dropBoardHandler(e: React.DragEvent<HTMLDivElement>, board: Boards) {
@@ -198,7 +195,7 @@ export class Words_field extends React.Component<Props,
           display: grid;
           column-gap: .6rem;
           row-gap: .94rem;
-          grid-template-columns: .1fr 1fr 1fr 1fr 1fr 1fr;
+          grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
         `
         const word = css`
           cursor: grab;

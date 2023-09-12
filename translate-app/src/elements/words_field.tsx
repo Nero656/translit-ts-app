@@ -159,7 +159,6 @@ export class Words_field extends React.Component<Props,
         const currentIndex = this.currentBoard.wordsList.indexOf(this.currentWord)
         this.currentBoard.wordsList.splice(currentIndex, 1)
 
-
         const wordsList = board.wordsList
 
         this.boardUpdate(wordsList, board)
@@ -310,6 +309,7 @@ export class Words_field extends React.Component<Props,
             }
             phrase = phrase.slice(0, -1)
             if (phrase === store.getState().phrase.phrases[this.props.randomInt].translate) {
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance('Answer is correct!'))
                 this.setState({isError: false, isSuccess: true})
             } else
                 this.setState({isError: true, isSuccess: false})

@@ -26,6 +26,7 @@ export class Words_field extends React.Component<Props,
         isError: boolean,
         isSuccess: boolean
     }> {
+    private readonly maxLength : number
     private currentWord: Words
     private currentBoard: Boards
 
@@ -44,6 +45,7 @@ export class Words_field extends React.Component<Props,
 
         this.currentWord = {id: 0, key: 0, word: '', enabled: false}
         this.currentBoard = {id: 0, wordsList: []}
+        this.maxLength = 12
     }
 
     splitString = (stringToSplit: string, separator: string) => {
@@ -67,7 +69,7 @@ export class Words_field extends React.Component<Props,
             })
         )
 
-        while (wordsArray.length < 12) {
+        while (wordsArray.length < this.maxLength) {
             wordsArray.push({
                 id: wordsArray.length,
                 key: wordsArray.length,
@@ -194,7 +196,6 @@ export class Words_field extends React.Component<Props,
           grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
           margin-top: -1px;
         `
-
         const wordField = css`
           width: 30rem;
           height: 3rem;
